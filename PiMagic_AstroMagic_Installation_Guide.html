@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>PiMagic &amp; AstroMagic Installation Guide</title>
+   <style type="text/css">
+      body {
+         font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+         font-size: 11pt;
+         color: #333;
+         background-color: #f8f8f8;
+         margin: 20px;
+         line-height: 1.5;
+      }
+      h1 {
+         color: #1e3a5f;
+         border-bottom: 2px solid #1e3a5f;
+         padding-bottom: 8px;
+         margin-top: 0;
+      }
+      h2 {
+         color: #2a5082;
+         border-bottom: 1px solid #ccc;
+         padding-bottom: 4px;
+         margin-top: 24px;
+      }
+      h3 {
+         color: #3a6090;
+         margin-top: 16px;
+      }
+      .section {
+         background: white;
+         padding: 16px;
+         margin: 12px 0;
+         border-radius: 6px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      .highlight {
+         background: #e8f4fc;
+         padding: 12px;
+         border-left: 4px solid #1e3a5f;
+         margin: 12px 0;
+      }
+      .warning {
+         background: #fff3e0;
+         padding: 12px;
+         border-left: 4px solid #f57c00;
+         margin: 12px 0;
+      }
+      .tip {
+         background: #e8f5e9;
+         padding: 12px;
+         border-left: 4px solid #4caf50;
+         margin: 12px 0;
+      }
+      code {
+         background: #f0f0f0;
+         padding: 2px 6px;
+         border-radius: 3px;
+         font-family: "Consolas", monospace;
+         font-size: 10pt;
+      }
+      ul, ol {
+         margin: 8px 0;
+         padding-left: 24px;
+      }
+      li {
+         margin: 4px 0;
+      }
+      .version {
+         color: #666;
+         font-size: 10pt;
+      }
+   </style>
+</head>
+<body>
+
+<h1>PiMagic &amp; AstroMagic Installation Guide</h1>
+<p class="version">&#169; 2025&#8211;2026 Christian Sasse &amp; Craig Stocks | <a href="https://pimagicstudio.com">pimagicstudio.com</a></p>
+
+<!-- ========== OVERVIEW ========== -->
+
+<h2>Overview</h2>
+<div class="section">
+   <p>The PiMagic/AstroMagic workflow requires four components:</p>
+   <p class="version"><strong>Current release:</strong> PiMagic Studio v2.4 (build v2.4-0005), paired with AstroMagic 2.4-0005. Always install AstroMagic and the PsMagic Actions that are bundled with this PiMagic build (see the install steps below) so the PixInsight script and the Photoshop plugin stay version-matched.</p>
+   <ol>
+      <li><strong>PiMagic</strong> &#8212; PixInsight script for automated image processing pipeline (installed via repository)</li>
+      <li><strong>RC-Astro CLI</strong> &#8212; mandatory stand-alone <code>rc-astro</code> command-line tool used by PiMagic v2.4 for BlurXTerminator, NoiseXTerminator, and StarXTerminator. Download from <a href="https://www.rc-astro.com/stand-alone-rc-astro-tools/">RC-Astro Stand-Alone Tools</a>.</li>
+      <li><strong>AstroMagic</strong> &#8212; Photoshop UXP plugin for layer organization and enhancement (installed from PiMagic&#8217;s Welcome Wizard, plugin checker, or Tools tab)</li>
+      <li><strong>PsMagic Actions</strong> &#8212; Photoshop action set used by AstroMagic (installed from PiMagic&#8217;s Welcome Wizard, plugin checker, or Tools tab; required for v2.1 and later, including the current AstroMagic 2.4-0005)</li>
+   </ol>
+</div>
+
+<!-- ========== QUICK START ========== -->
+
+<h2>Quick Start (Expert Users)</h2>
+<div class="section">
+   <ol>
+      <li><strong>PiMagic</strong> &#8594; Resources &#8594; Updates &#8594; Manage Repositories &#8594; Add <code>https://pixinsight.pimagicstudio.com/</code> &#8594; Check for Updates &#8594; Restart</li>
+      <li><strong>RC-Astro CLI</strong> &#8594; Download from <a href="https://www.rc-astro.com/stand-alone-rc-astro-tools/">RC-Astro Stand-Alone Tools</a> &#8594; Install the macOS <code>.pkg</code> or Windows x64 <code>.exe</code> &#8594; activate BXT/NXT/SXT if prompted &#8594; run <code>rc-astro download-models</code></li>
+      <li><strong>AstroMagic</strong> &#8594; PiMagic Welcome Wizard / Check Plugins / Tools tab &#8594; Install Plugin &#8594; Creative Cloud installs &#8594; Restart Photoshop</li>
+      <li><strong>PsMagic Actions</strong> &#8594; Open Photoshop &#8594; PiMagic Welcome Wizard / Check Plugins / Tools tab &#8594; Install Actions (runs automatically in Photoshop)</li>
+   </ol>
+   <p>Detailed instructions for each component follow below.</p>
+</div>
+
+<!-- ========== MOSAIC: ONE RUN ========== -->
+
+<div class="highlight">
+   <strong>Mosaics are now produced in a single PiMagic run.</strong> You no longer run PiMagic a second time and there is no &#8220;two-cycle&#8221; or &#8220;two-pass&#8221; mosaic step. In one run PiMagic stacks and processes every pane, plate-solves each pane, then aligns the panes by coordinates (PixInsight <em>MosaicByCoordinates</em>) onto one common full canvas and hands the already-aligned panes off to AstroMagic. AstroMagic / Photoshop then only <em>blends</em> the seams &#8212; it does not re-align the panes. Because PiMagic owns the coordinate alignment in the same run, the only setup that matters for mosaics is that plate solving works: make sure ASTAP and its star databases are installed (see below).
+</div>
+
+<!-- ========== PIMAGIC INSTALLATION ========== -->
+
+<h2>PiMagic Installation (PixInsight Script)</h2>
+<div class="section">
+
+   <h3>Prerequisites</h3>
+   <ol>
+      <li><strong>PixInsight 1.9.4 (Lockhart) or later</strong> installed (64-bit) &#8212; <strong>mandatory.</strong> PiMagic v2.4 uses the <strong>V8 JavaScript engine</strong> that ships in PixInsight 1.9.4; version 1.9.3 and earlier (SpiderMonkey engine) <strong>will not run it</strong>. Update PixInsight first if you are on an older version.</li>
+      <li><strong>Stand-alone RC-Astro CLI</strong> installed and licensed for the RC-Astro tools you use. PiMagic v2.4 calls <code>rc-astro</code> directly for BlurXTerminator, NoiseXTerminator, and StarXTerminator. Installing the PixInsight RC-Astro process modules alone is not sufficient.</li>
+      <li>ASTAP plate solver installed with W08 and D50 star databases &#8212; see details below</li>
+      <li>Gaia DR3 and Gaia DR3SP databases installed in PixInsight (required for SPCC) &#8212; see details below</li>
+   </ol>
+
+   <h3>Installation via Repository</h3>
+   <p>PiMagic is installed through PixInsight&#8217;s built-in update system:</p>
+   <ol>
+      <li>In PixInsight, go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Manage Repositories</strong></li>
+      <li>Click <strong>Add</strong></li>
+      <li>Enter the repository URL: <strong><code>https://pixinsight.pimagicstudio.com/</code></strong></li>
+      <li>Click <strong>OK</strong> to close the Manage Repositories dialog</li>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>Click <strong>Apply</strong> to install the PiMagic package</li>
+      <li><strong>Quit PixInsight</strong> and confirm installation of updates when prompted</li>
+      <li>Restart PixInsight</li>
+   </ol>
+
+   <h3>Accessing PiMagic</h3>
+   <p>After installation, PiMagic will be available at:</p>
+   <p><strong>Script &#8594; PiMagic Studio &#8594; PiMagic</strong></p>
+
+   <h3>PiMagic License Activation</h3>
+   <p>On first launch, the license activation dialog will appear:</p>
+   <ol>
+      <li>Enter your license key from your purchase confirmation email</li>
+      <li>Click Activate</li>
+      <li>The dialog will confirm activation with your registered name</li>
+   </ol>
+   <p><strong>Managing Your License:</strong> Access the Tools tab to activate, deactivate, or view your PiMagic Studio license status. This one license covers PiMagic and AstroMagic. There is no separate AstroMagic license entry or activation step. Deactivating in PiMagic frees up an activation slot for use on another machine.</p>
+
+   <h3>Mandatory: Install RC-Astro CLI for PiMagic v2.4</h3>
+   <div class="warning">
+      <strong>Required:</strong> PiMagic v2.4 does not run BlurXTerminator, NoiseXTerminator, or StarXTerminator through the PixInsight RC-Astro process modules. It requires the stand-alone <code>rc-astro</code> command-line tool. Without the CLI, the BXT/NXT/SXT stages cannot run.
+   </div>
+   <ol>
+      <li>Download the stand-alone tools from <a href="https://www.rc-astro.com/stand-alone-rc-astro-tools/">RC-Astro Stand-Alone Tools</a>.</li>
+      <li>Install the macOS universal <code>.pkg</code> on Mac or the Windows x64 <code>.exe</code> on Windows.</li>
+      <li>Use your RC-Astro account activation commands for BlurXTerminator, NoiseXTerminator, and StarXTerminator if the CLI reports that a product is not licensed. Existing RC-Astro product licenses are used; the CLI itself is free for license holders.</li>
+      <li>Run <code>rc-astro download-models</code> once to pre-download the AI models.</li>
+      <li>Launch PiMagic and run <strong>Tools &rarr; Check Plugins</strong>. Confirm that the RC-Astro CLI and the BXT/NXT/SXT license checks pass before starting a processing run.</li>
+   </ol>
+
+   <h3>Updating PiMagic</h3>
+   <p>Future updates are delivered automatically through the repository:</p>
+   <ol>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>Install any available updates</li>
+      <li>Restart PixInsight</li>
+   </ol>
+
+   <h3>Troubleshooting</h3>
+   <h3><em>Script Not Appearing in Menu</em></h3>
+   <ol>
+      <li>Ensure you quit and restarted PixInsight after applying updates</li>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong> and verify installation completed</li>
+      <li>Check <strong>Process Explorer</strong> (Ctrl+Alt+P on Windows, Cmd+Alt+P on Mac) &#8594; Scripts &#8594; All Scripts to verify installation</li>
+   </ol>
+</div>
+
+<!-- ========== GRAXPERT ========== -->
+
+<h2>Optional: Installing GraXpert Process</h2>
+<div class="section">
+   <p>For GraXpert integration in PixInsight, you can install Jo&#235;l Vallier&#8217;s GraXpert Process. This requires the GraXpert desktop application to be installed <strong>first</strong>.</p>
+
+   <h3>Part A: Install GraXpert Desktop Application</h3>
+   <ol>
+      <li>Download GraXpert from <a href="https://www.graxpert.com">graxpert.com</a></li>
+      <li>Install GraXpert:
+         <ul>
+            <li><strong>Windows:</strong> Run the downloaded .exe file</li>
+            <li><strong>macOS:</strong> Open the .dmg file and drag GraXpert to your Applications folder</li>
+            <li><strong>Linux:</strong> Make the file executable with <code>chmod u+x ./GraXpert-linux</code></li>
+         </ul>
+      </li>
+      <li>Launch GraXpert and process one image in AI mode to download the AI models</li>
+   </ol>
+   <div class="tip">
+      <strong>Note:</strong> The first AI model download may take several minutes.
+   </div>
+
+   <h3>Part B: Install GraXpert Process in PixInsight</h3>
+   <p><strong>Prerequisites:</strong> PixInsight 1.9.4 (Lockhart) or later (the version PiMagic v2.4 requires); GraXpert version 3.0.0 or higher</p>
+   <ol>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Manage Repositories</strong></li>
+      <li>Click <strong>Add</strong></li>
+      <li>Enter: <strong><code>https://pixinsight.deepskyforge.com/update/graxpert-process/</code></strong></li>
+      <li><strong>Important:</strong> Don&#8217;t forget the trailing slash &#8220;/&#8221; at the end!</li>
+      <li>Click <strong>OK</strong></li>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>Click <strong>Apply</strong> to install the GraXpert Process package</li>
+      <li>Exit PixInsight and confirm the installation of updates</li>
+      <li>Restart PixInsight</li>
+   </ol>
+   <p>After installation, GraXpert Process is available under <strong>Process</strong> &#8594; <strong>&lt;Etc&gt;</strong> &#8594; <strong>GraXpert</strong></p>
+   <p>Documentation: <a href="https://www.deepskyforge.com/documents/GraXpertProcess4PixInsight-EN.pdf">GraXpertProcess4PixInsight-EN.pdf</a></p>
+</div>
+
+<!-- ========== TOOLBOX (GRAXPERT LIBRARY) ========== -->
+
+<h2>Optional: Installing Toolbox (for GraXpert Library Integration)</h2>
+<div class="section">
+   <p>If <strong>Toolbox</strong> already appears under <strong>Script</strong> &#8594; <strong>Toolbox</strong> menu, skip this section!</p>
+   <p>PiMagic can optionally use J&#252;rgen Terpe&#8217;s Toolbox for GraXpert library integration. This is not required &#8211; PiMagic works without it, but the GraXpert checkbox will be disabled.</p>
+
+   <h3>To install Toolbox:</h3>
+   <ol>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Manage Repositories</strong></li>
+      <li>Click <strong>Add</strong></li>
+      <li>Enter: <strong><code>https://www.ideviceapps.de/PixInsight/Utilities/</code></strong></li>
+      <li>Click <strong>OK</strong></li>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>Install the updates when prompted</li>
+      <li>Restart PixInsight</li>
+   </ol>
+   <p>After installation, Toolbox scripts appear under <strong>Script</strong> &#8594; <strong>Toolbox</strong></p>
+   <p>More information: <a href="https://www.ideviceapps.de/pixinsight-toolbox.html">https://www.ideviceapps.de/pixinsight-toolbox.html</a></p>
+</div>
+
+<!-- ========== ASTAP ========== -->
+
+<h2>Required: Installing ASTAP (Plate Solving)</h2>
+<div class="section">
+   <p>ASTAP (Astrometric STAcking Program) is a free plate-solving application required by PiMagic for astrometric solutions. ASTAP must be installed along with star databases before running PiMagic. PiMagic uses different databases depending on the field of view: <strong>W08</strong> for wide-field and nightscape images (FOV &gt; 20&#176;), and <strong>D50</strong> for narrow-field deep-sky images (FOV &lt; 10&#176;). Both databases should be installed for full compatibility.</p>
+
+   <h3>Windows Installation</h3>
+   <ol>
+      <li>Download ASTAP from: <a href="https://www.hnsky.org/astap.htm">hnsky.org/astap.htm</a></li>
+      <li>Run the downloaded installer (.exe) and follow the installation wizard</li>
+      <li>When prompted, select the default installation directory (or choose your preferred location)</li>
+      <li>After ASTAP is installed, you must also install the star database (see below)</li>
+   </ol>
+
+   <h3>macOS Installation</h3>
+   <ol>
+      <li>Download ASTAP for macOS from: <a href="https://www.hnsky.org/astap.htm">hnsky.org/astap.htm</a></li>
+      <li>Open the downloaded .dmg file</li>
+      <li>Drag the ASTAP application to your Applications folder</li>
+      <li>If macOS blocks the app, go to System Settings &#8594; Privacy &amp; Security &#8594; click &#8220;Open Anyway&#8221;</li>
+      <li>After ASTAP is installed, you must also install the star database (see below)</li>
+   </ol>
+
+   <h3>Installing ASTAP Star Databases (Required)</h3>
+   <p>ASTAP requires star databases for plate solving. PiMagic automatically selects the appropriate database based on your image&#8217;s field of view. <strong>Install both databases</strong> for full compatibility:</p>
+   <p><strong>W08 Database</strong> (wide-field, nightscape &#8212; FOV &gt; 20&#176;):</p>
+   <ol>
+      <li>Download the W08 database from: <a href="https://www.hnsky.org/astap.htm#star_databases">hnsky.org/astap.htm#star_databases</a></li>
+      <li>Windows: Run the W08 database installer &#8212; it will automatically place files in the correct ASTAP directory</li>
+      <li>macOS: Extract the downloaded archive and copy the database files to the ASTAP database folder (typically /Applications/astap/data/ or the folder shown in ASTAP&#8217;s settings)</li>
+   </ol>
+   <p><strong>D50 Database</strong> (narrow-field, deep-sky &#8212; FOV &lt; 10&#176;):</p>
+   <ol>
+      <li>Download the D50 database from: <a href="https://www.hnsky.org/astap.htm#star_databases">hnsky.org/astap.htm#star_databases</a></li>
+      <li>Windows: Run the D50 database installer &#8212; it will automatically place files in the correct ASTAP directory</li>
+      <li>macOS: Extract the downloaded archive and copy the database files to the ASTAP database folder</li>
+   </ol>
+   <p><em>Note: For medium-field images (10&#8211;20&#176;), ASTAP may also use the G05 database if installed.</em></p>
+
+   <h3>Nightscape Mosaics: Two Alignment Methods</h3>
+   <p>When you build a multi-pane <strong>nightscape / landscape mosaic</strong>, PiMagic offers two ways to align the panes. The control is the <strong>Mosaic:</strong> dropdown shown next to the <strong>Nightscape</strong> checkbox (it appears only when Nightscape is checked). Both methods run in a <strong>single PiMagic run</strong> &#8212; the choice only decides <em>who aligns</em> the panes, not how many PiMagic passes you make.</p>
+   <ol>
+      <li><strong>Coordinates</strong> (default, recommended) &#8212; PiMagic plate-solves every pane and aligns them by coordinates using PixInsight <em>MosaicByCoordinates</em> (forced to a Stereographic projection for wide nightscape geometry), then hands the pre-aligned panes to AstroMagic, which only blends them. This is the same idea as the deep-sky mosaic and gives sub-pixel registration plus PiMagic-owned whole-mosaic annotation. <strong>Requires ASTAP and the wide-field W08 database</strong> so the panes solve. Use this whenever the panes contain enough real sky/stars to plate-solve reliably.</li>
+      <li><strong>Photoshop Align+Blend</strong> (the older v2.0 behaviour) &#8212; PiMagic skips coordinate alignment, saves the pane outputs, and AstroMagic / Photoshop runs its own feature-based <em>Auto-Align</em> and then <em>Auto-Blend</em> on all panes. Choose this for very wide / ultra-wide panoramas, large foregrounds, or sparse star fields where plate solving the individual panes is unreliable, so you let Photoshop stitch them. (Whole-mosaic coordinate annotation is not produced in this mode.)</li>
+   </ol>
+   <div class="tip">
+      <strong>Tip:</strong> Leave the dropdown on <strong>Coordinates</strong> unless your nightscape panes will not plate-solve. The <strong>Coordinates</strong> method depends on a working ASTAP installation; the <strong>Photoshop Align+Blend</strong> method does not need ASTAP for the alignment step but still relies on AstroMagic + the PsMagic Actions in Photoshop.
+   </div>
+
+   <h3>Verifying ASTAP Installation</h3>
+   <ol>
+      <li>Launch ASTAP</li>
+      <li>Open any astronomical FITS or TIFF image</li>
+      <li>Click &#8220;Solve&#8221; to attempt a plate solve</li>
+      <li>If the solve succeeds, ASTAP and the database are correctly installed</li>
+      <li>If it fails with a database error, verify the database files are in ASTAP&#8217;s data directory</li>
+   </ol>
+</div>
+
+<!-- ========== GAIA DR3 ========== -->
+
+<h2>Required: Installing Gaia DR3 and DR3SP Databases (PixInsight)</h2>
+<div class="section">
+   <p>PiMagic uses SPCC (Spectrophotometric Color Calibration) which requires the Gaia DR3 and Gaia DR3SP star databases installed in PixInsight. Without these databases, SPCC color calibration will fail.</p>
+
+   <h3>Installation Steps</h3>
+   <ol>
+      <li>In PixInsight, go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Manage Repositories</strong></li>
+      <li>Verify that the standard PixInsight repository is listed (it should be there by default)</li>
+      <li>Go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>In the update list, look for &#8220;Gaia DR3&#8221; and &#8220;Gaia DR3SP&#8221; database packages</li>
+      <li>Select both packages and click <strong>Apply</strong> to install</li>
+      <li>Quit PixInsight and confirm installation when prompted</li>
+      <li>Restart PixInsight</li>
+   </ol>
+
+   <h3>Verifying Installation</h3>
+   <p>To confirm the databases are properly installed:</p>
+   <ol>
+      <li>Open any image in PixInsight</li>
+      <li>Go to Process &#8594; ColorCalibration &#8594; SpectrophotometricColorCalibration</li>
+      <li>In the SPCC dialog, check that &#8220;Gaia DR3&#8221; and &#8220;Gaia DR3SP&#8221; catalogs appear in the catalog dropdown</li>
+      <li>If the catalogs are missing, repeat the installation steps above</li>
+   </ol>
+   <div class="warning">
+      <strong>Note:</strong> The Gaia DR3 and DR3SP database downloads are large (several GB total). Ensure you have sufficient disk space and a stable internet connection during installation.
+   </div>
+</div>
+
+<!-- ========== ASTROMAGIC INSTALLATION ========== -->
+
+<h2>AstroMagic Installation (Photoshop Plugin)</h2>
+<div class="section">
+
+   <h3>Prerequisites</h3>
+   <ol>
+      <li>Adobe Photoshop 2023 (v24.0) or later</li>
+      <li>Adobe Creative Cloud Desktop app installed and running</li>
+      <li>PiMagic installed in PixInsight (the AstroMagic plugin and actions are included with PiMagic)</li>
+   </ol>
+
+   <h3>Installation via PiMagic Welcome Wizard, Plugin Checker, or Tools Tab</h3>
+   <p>AstroMagic and PsMagic Actions are installed from the same PiMagic controls in PixInsight. New users see them in the first-run Welcome Wizard; they are also available later from <em>Tools &rarr; Check Plugins</em> and from the Tools tab:</p>
+   <ol>
+      <li>Launch PiMagic in PixInsight (Script &#8594; PiMagic Studio &#8594; PiMagic)</li>
+      <li>Use the first-run Welcome Wizard, <em>Tools &rarr; Check Plugins</em>, or the <strong>Tools</strong> tab</li>
+      <li>In the AstroMagic section, click <strong>Install Plugin</strong></li>
+      <li>The Adobe Creative Cloud installer will launch automatically</li>
+      <li>You will see a security warning: &#8220;This plugin hasn&#8217;t been verified by Adobe&#8221;</li>
+      <li>Click <strong>Install locally</strong></li>
+      <li>You will see another warning about third-party plugins</li>
+      <li>Click <strong>OK</strong> to confirm the installation</li>
+      <li>Wait for the installation to complete</li>
+      <li>Restart Photoshop</li>
+   </ol>
+
+   <h3>Accessing AstroMagic</h3>
+   <p>After installation, access AstroMagic in Photoshop:</p>
+   <p><strong>Plugins &#8594; AstroMagic</strong></p>
+   <p>The AstroMagic panel will open and can be docked anywhere in your workspace.</p>
+
+   <h3>Troubleshooting</h3>
+
+   <h3><em>Plugin Not Appearing in Plugins Menu</em></h3>
+   <ol>
+      <li><strong>Restart Photoshop</strong> completely (close and reopen)</li>
+      <li>Verify the plugin is installed: Go to <strong>Plugins</strong> &#8594; <strong>Manage Plugins</strong> in Photoshop</li>
+      <li>Look for AstroMagic in the list and make sure it is <strong>enabled</strong></li>
+      <li>Check that your Photoshop version is 2023 (v24.0) or later</li>
+   </ol>
+
+   <h3><em>Installation Fails with Error Code</em></h3>
+   <ol>
+      <li>Make sure the .ccx file is on the same drive as Photoshop</li>
+      <li>Use the <strong>Open Folder</strong> button in PiMagic&#8217;s Tools tab to verify the .ccx file exists</li>
+      <li>Quit Creative Cloud Desktop completely, restart it, then try again</li>
+   </ol>
+
+   <h3><em>macOS Security Warning</em></h3>
+   <p>If you see &#8220;can&#8217;t be opened because it is from an unidentified developer&#8221;:</p>
+   <ol>
+      <li>Go to <strong>System Preferences</strong> &#8594; <strong>Security &amp; Privacy</strong> &#8594; <strong>General</strong></li>
+      <li>Click <strong>Open Anyway</strong> next to the blocked plugin message</li>
+   </ol>
+</div>
+
+<!-- ========== PSMAGIC ACTIONS ========== -->
+
+<h2>Installing PsMagic Actions (Required)</h2>
+<div class="section">
+   <p>AstroMagic v2.1 and later (the current release is AstroMagic 2.4-0005, paired with PiMagic v2.4-0005) requires the PsMagic Actions action set to be installed in Photoshop. These actions provide reliable Smart Filter and layer group functionality.</p>
+
+   <h3>Installation via PiMagic Welcome Wizard, Plugin Checker, or Tools Tab</h3>
+   <div class="warning">
+      <strong>Important:</strong> Photoshop must be open before clicking Install Actions.
+   </div>
+   <ol>
+      <li>Open <strong>Photoshop</strong> (it must be running)</li>
+      <li>Launch PiMagic in PixInsight (Script &#8594; PiMagic Studio &#8594; PiMagic)</li>
+      <li>Use the first-run Welcome Wizard, <em>Tools &rarr; Check Plugins</em>, or the <strong>Tools</strong> tab</li>
+      <li>In the AstroMagic section, click <strong>Install Actions</strong></li>
+      <li>PiMagic connects directly to Photoshop and runs the installer automatically &#8212; no file browsing needed</li>
+      <li>The installer removes any existing PsMagic Actions set and loads the current version</li>
+      <li>A success confirmation will appear when installation is complete</li>
+   </ol>
+
+   <h3>Verify Installation</h3>
+   <p>After installation, you should see <strong>PsMagic Actions</strong> listed in your Actions panel (Window &#8594; Actions). The action set contains actions used by AstroMagic for layer group creation, continuum subtraction, and structure enhancement. Note that there should be only one set of PsMagic Actions listed in the Actions panel.</p>
+</div>
+
+<!-- ========== LICENSE ACTIVATION ========== -->
+
+<h2>AstroMagic License Status</h2>
+<div class="section">
+   <p>AstroMagic uses the PiMagic Studio license activated in PiMagic. There is no separate AstroMagic license key, license tab, activation button, or deactivation button.</p>
+   <ol>
+      <li>Activate your PiMagic Studio license in PixInsight under <strong>PiMagic &rarr; Tools &rarr; Manage License</strong></li>
+      <li>Open AstroMagic in Photoshop</li>
+      <li>Use <strong>Refresh PiMagic License</strong> in AstroMagic only if the displayed status has not updated yet</li>
+   </ol>
+   <p><strong>Managing Your License:</strong> All activation, deactivation, and transfer operations happen in PiMagic. AstroMagic follows the same license state.</p>
+</div>
+
+<!-- ========== LICENSE INFO ========== -->
+
+<h2>License Information</h2>
+<div class="section">
+   <p>Each PiMagic Studio license allows activation on a limited number of machines (see your purchase details). To transfer a license to a new machine:</p>
+   <ol>
+      <li><strong>PiMagic:</strong> Go to Tools tab &#8594; Manage License &#8594; Deactivate</li>
+      <li><strong>AstroMagic:</strong> No separate action is required; it uses the PiMagic license state</li>
+   </ol>
+   <p>After deactivation, you can activate on your new machine using the same PiMagic Studio license key.</p>
+</div>
+
+<!-- ========== UPDATING ========== -->
+
+<h2>Updating AstroMagic</h2>
+<div class="section">
+   <p>To install the current bundled AstroMagic files after a PiMagic update:</p>
+   <ol>
+      <li>Update PiMagic via <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong> (the updated AstroMagic files are included with PiMagic updates)</li>
+      <li>In PiMagic&#8217;s Welcome Wizard, plugin checker, or Tools tab, click <strong>Install Plugin</strong> to install the current bundled plugin</li>
+      <li>If the bundled PsMagic Action set changed, click <strong>Install Actions</strong> (this automatically removes old versions)</li>
+      <li>Restart Photoshop</li>
+   </ol>
+   <div class="warning">
+      <strong>Note:</strong> Do not uninstall the old version first &#8211; this may delete your preferences and settings.
+   </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+
+<p class="version">&#169; 2025&#8211;2026 Christian Sasse &amp; Craig Stocks. All rights reserved.<br/>
+PiMagic, AstroMagic, and pimagicstudio.com are trademarks of Sasse Consulting.</p>
+
+</body>
+</html>

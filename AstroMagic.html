@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+   <title>AstroMagic Documentation</title>
+   <style type="text/css">
+      body {
+         font-family: "Segoe UI", Tahoma, Geneva, sans-serif;
+         font-size: 11pt;
+         color: #333;
+         background-color: #f8f8f8;
+         margin: 20px;
+         line-height: 1.5;
+      }
+      h1 {
+         color: #1e3a5f;
+         border-bottom: 2px solid #1e3a5f;
+         padding-bottom: 8px;
+         margin-top: 0;
+      }
+      h2 {
+         color: #2a5082;
+         border-bottom: 1px solid #ccc;
+         padding-bottom: 4px;
+         margin-top: 24px;
+      }
+      h3 {
+         color: #3a6090;
+         margin-top: 16px;
+      }
+      .section {
+         background: white;
+         padding: 16px;
+         margin: 12px 0;
+         border-radius: 6px;
+         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+      .highlight {
+         background: #e8f4fc;
+         padding: 12px;
+         border-left: 4px solid #1e3a5f;
+         margin: 12px 0;
+      }
+      .warning {
+         background: #fff3e0;
+         padding: 12px;
+         border-left: 4px solid #f57c00;
+         margin: 12px 0;
+      }
+      .tip {
+         background: #e8f5e9;
+         padding: 12px;
+         border-left: 4px solid #4caf50;
+         margin: 12px 0;
+      }
+      code {
+         background: #f0f0f0;
+         padding: 2px 6px;
+         border-radius: 3px;
+         font-family: "Consolas", monospace;
+         font-size: 10pt;
+      }
+      table {
+         border-collapse: collapse;
+         width: 100%;
+         margin: 12px 0;
+      }
+      th, td {
+         border: 1px solid #ddd;
+         padding: 8px;
+         text-align: left;
+      }
+      th {
+         background: #1e3a5f;
+         color: white;
+      }
+      tr:nth-child(even) {
+         background: #f9f9f9;
+      }
+      ul, ol {
+         margin: 8px 0;
+         padding-left: 24px;
+      }
+      li {
+         margin: 4px 0;
+      }
+      .version {
+         color: #666;
+         font-size: 10pt;
+      }
+      .quote {
+         font-style: italic;
+         color: #555;
+         border-left: 3px solid #ccc;
+         padding-left: 12px;
+         margin: 12px 0;
+      }
+   </style>
+</head>
+<body>
+
+<h1>&#128295; AstroMagic</h1>
+<p class="version">Version 2.4 Build 2.4-0006 | Photoshop UXP Plugin | Companion to PiMagic for PixInsight<br/>
+Paired with PiMagic v2.4 (build v2.4-0006)<br/>
+&#169; 2025&#8211;2026 Christian Sasse &amp; Craig Stocks | <a href="https://pimagicstudio.com">pimagicstudio.com</a></p>
+
+<div class="section">
+   <p><strong>AstroMagic</strong> is the companion Photoshop plugin that organizes PiMagic outputs into properly structured layer groups, ready for creative post-processing. It bridges the gap between automated processing in PixInsight and artistic finishing in Photoshop.</p>
+
+   <div class="quote">
+      "From PixInsight to Photoshop in one click &#8212; AstroMagic organizes your layers so you can focus on the art."
+   </div>
+
+   <div class="highlight">
+      <strong>Workflow:</strong> PiMagic processes your data in PixInsight and generates output files. AstroMagic imports those files into Photoshop as organized layer groups, with actions for further enhancement.
+   </div>
+</div>
+
+<!-- ========== KEY FEATURES ========== -->
+
+<h2>Key Features</h2>
+<div class="section">
+   <ul>
+      <li><strong>Automatic Layer Organization</strong> &#8212; Creates properly named layer groups for SHO/HOO/RGB/narrowband palettes. Each channel and stretch variant is placed in the correct group with appropriate blending modes.</li>
+      <li><strong>Mosaic Assembly</strong> &#8212; Blends multi-panel mosaics using PiMagic&#8217;s coordinate handoff. Import the parent PiMagic output folder and AstroMagic reads <code>mosaic_magic.json</code>, uses the PiMagic-aligned panes, skips Photoshop Auto-Align when geometry is complete, and runs Auto-Blend / layer organization. <strong>A mosaic is now produced in a single PiMagic run &#8212; there is no &#8220;two-cycle&#8221;, no &#8220;two-pass&#8221;, and no user-started second PiMagic run.</strong> In that one run PiMagic plate-solves every pane, reprojects them onto one common full canvas with PixInsight&#8217;s <code>MosaicByCoordinates</code> engine, and hands the already-aligned panes to AstroMagic; AstroMagic then only blends them in Photoshop. The division of labour is fixed: PiMagic is the geometry oracle (one plate-solve per pane, store the WCS, MosaicByCoordinates joins the panes onto the canvas) and AstroMagic / Photoshop is the compositing engine (it blends only and never re-aligns when the coordinate handoff is present). The reported handoff contract is <code>handoff_mode = &#8220;full_canvas_no_alpha_lzw&#8221;</code>, which tells AstroMagic the panes are pre-aligned so it can skip Auto-Align and feather only the seams.</li>
+      <li><strong>Save for PiMagic</strong> &#8212; Legacy/manual fallback export for older two-pass workflows. The current public mosaic workflow does not require a second PiMagic pass; PiMagic creates the coordinate-aligned mosaic handoff in one run.</li>
+      <li><strong>Recursive Folder Loading</strong> &#8212; Import Folder scans all subfolders automatically. You can select the top-level PiMagic output folder and AstroMagic will find all TIFF files, metadata, and annotation overlays.</li>
+      <li><strong>Auto-Endpoints</strong> &#8212; Histogram isolation per channel for optimal starting point. Automatically sets black and white points to bring out detail without clipping.</li>
+      <li><strong>Stars Hue/Saturation</strong> &#8212; Presets for controlling star colors. Quickly adjust star hues, reduce oversaturated stars, or enhance natural star colors.</li>
+      <li><strong>Mono-to-RGB Conversion</strong> &#8212; Convert individual monochrome channel layers into color composites directly within Photoshop.</li>
+      <li><strong>PsMagic Actions</strong> &#8212; One-click Photoshop Actions for layer blending, star manipulation, narrowband palette switching, continuum subtraction, and structure enhancement.</li>
+      <li><strong>AutoMode Hand-Off from PiMagic</strong> &#8212; The AstroMagic side of a PiMagic &rarr; Photoshop hand-off. When PiMagic starts a handoff, it writes a <code>Monitor_start.json</code> signal into the AstroMagic UXP plugin data folder; the panel&#8217;s background poller picks it up within a few seconds and begins watching the PiMagic output folder on a 5-second cadence. When PiMagic finishes, it writes <code>Complete.txt</code> and <code>_pimagic.json</code>. For mosaics, PiMagic also writes <code>mosaic_magic.json</code> and aligned pane TIFFs. AstroMagic imports the parent PiMagic folder, preserves metadata, skips Photoshop Auto-Align when the coordinate handoff is complete, runs Auto-Blend where needed, saves the PSB, and writes <code>Import_complete.json</code> back to the output folder.</li>
+      <li><strong>Palette Visibility Rules</strong> &#8212; Automatically manages layer visibility based on your selected narrowband palette. When using SHO, plain RGB layers are hidden. When using DNBHO, both RGB and narrowband layers remain visible.</li>
+   </ul>
+</div>
+
+<!-- ========== USER INTERFACE ========== -->
+
+<h2>User Interface</h2>
+<div class="section">
+   <p>AstroMagic&#8217;s interface is organized into six tabs:</p>
+
+   <h3>Import Tab</h3>
+   <p>The primary tab for loading files into Photoshop.</p>
+   <ul>
+      <li><strong>Import Folder</strong> &#8212; Opens a folder picker. For PiMagic mosaics, select the parent <code>PiMagic</code> output folder so AstroMagic can read <code>mosaic_magic.json</code>, <code>_pimagic.json</code>, <code>Images/By_Pane/Align_by_Coordinates/</code>, and <code>Images/Complete_Mosaic/</code>. Directly selecting the aligned-pane folder can hide the sidecars from Photoshop&#8217;s UXP sandbox.</li>
+      <li><strong>Import Images</strong> &#8212; Opens a file picker to select individual TIFF files for import.</li>
+      <li><strong>Save Mosaics</strong> &#8212; Legacy/manual fallback export for older or manually assembled mosaics. It is not required for the current PiMagic single-run mosaic workflow, where PiMagic aligns the panes by coordinates (MosaicByCoordinates) onto one full canvas and hands them to AstroMagic to blend &#8212; all in one run, with no second PiMagic pass.</li>
+      <li><strong>Narrowband Palette</strong> &#8212; Select the color palette for narrowband data: SHO (Hubble Palette), HOO (H Red + O Cyan), or Ha Enhanced (Red Only).</li>
+      <li><strong>Merge Options</strong> &#8212; &#8220;Merge Base with End Points&#8221; merges the base layer with the auto-endpoints adjustment for a flattened starting point.</li>
+   </ul>
+
+   <h3>Global Tab</h3>
+   <ul>
+      <li><strong>Load Layers from Files</strong> &#8212; Load individual files as layers into the current document.</li>
+      <li><strong>Make Annotations Layer Group</strong> &#8212; Creates an organized group for annotation, census, and sky map overlays.</li>
+      <li><strong>Make Stars Layer Group</strong> &#8212; Creates a stars layer group with Hue/Saturation and Levels adjustment layers.</li>
+      <li><strong>Make Global Adjustments Layer Group</strong> &#8212; Creates a group with Hue/Saturation, Color Balance, Levels, Burn and Dodge, and End Points adjustments.</li>
+   </ul>
+
+   <h3>Filters Tab</h3>
+   <p>Create individual filter layer groups for narrowband and broadband channels:</p>
+   <ul>
+      <li><strong>SHO Groups</strong> &#8212; Sulfur (Red), Hydrogen (Green), Oxygen (Blue)</li>
+      <li><strong>HOO Groups</strong> &#8212; Hydrogen (Red), Oxygen (Cyan)</li>
+      <li><strong>Broadband Groups</strong> &#8212; Mono Luminance, Red, Green, Blue</li>
+   </ul>
+   <p>Each group is created with appropriate adjustment layers (Hue/Saturation, Color Balance, Levels, Burn and Dodge, End Points) for immediate creative processing.</p>
+
+   <h3>Enhance Tab</h3>
+   <p>Enhancement tools for fine-tuning your image after layer organization.</p>
+
+   <h3>Continuum Tab</h3>
+   <p>Continuum subtraction tools for narrowband processing. Removes broadband continuum emission from narrowband channels for cleaner nebula data.</p>
+
+   <h3>Tools Tab</h3>
+   <p>AstroMagic availability status, about information, and diagnostic tools. AstroMagic is free and does not require activation.</p>
+</div>
+
+<!-- ========== IMPORT WORKFLOW ========== -->
+
+<h2>Import Workflow</h2>
+<div class="section">
+   <h3>Standard Import (Single Target)</h3>
+   <ol>
+      <li>Process your data in PiMagic (PixInsight). When complete, PiMagic saves output files to a dated folder.</li>
+      <li>In AstroMagic, click <strong>Import Folder</strong>.</li>
+      <li>Select the PiMagic output folder (e.g., <code>PiMagic-M82-2026-04-06/</code>). AstroMagic will scan all subfolders automatically.</li>
+      <li>AstroMagic creates the Photoshop document with all layers organized into groups:
+         <ul>
+            <li>Starless groups with adjustment layers (one per filter/palette)</li>
+            <li>Stars group with color adjustment layers</li>
+            <li>Annotation overlay layers (Annotation, Star Census, Sky Map)</li>
+            <li>Image metadata text layer</li>
+         </ul>
+      </li>
+   </ol>
+
+   <h3>Layer Naming Convention</h3>
+   <p>AstroMagic follows PiMagic&#8217;s standardized naming. Output files use the pattern:</p>
+   <table>
+      <tr><th>File Pattern</th><th>Layer Name</th><th>Group</th></tr>
+      <tr><td><code>Starless_ObjectName_SHO.tif</code></td><td>Starless_ObjectName_SHO</td><td>Starless ObjectName SHO</td></tr>
+      <tr><td><code>Starless_ObjectName_HOO.tif</code></td><td>Starless_ObjectName_HOO</td><td>Starless ObjectName HOO</td></tr>
+      <tr><td><code>Starless_ObjectName_RGB.tif</code></td><td>Starless_ObjectName_RGB</td><td>Starless ObjectName RGB</td></tr>
+      <tr><td><code>Stars_ObjectName_SHO.tif</code></td><td>Stars_ObjectName_SHO</td><td>Stars</td></tr>
+      <tr><td><code>Stars_ObjectName_Ha.tif</code></td><td>Stars_ObjectName_Ha</td><td>Stars</td></tr>
+      <tr><td><code>Final_ObjectName_RGB.tif</code></td><td>Final_ObjectName_RGB</td><td>(base layer)</td></tr>
+      <tr><td><code>Annotation_Overlay_*.tif</code></td><td>Annotation</td><td>Annotations</td></tr>
+      <tr><td><code>Census_Overlay_*.tif</code></td><td>Star Census</td><td>Annotations</td></tr>
+      <tr><td><code>SkyMap_Overlay_*.tif</code></td><td>Sky Map</td><td>Annotations</td></tr>
+   </table>
+
+   <h3>Palette Visibility Rules</h3>
+   <p>When importing narrowband data, AstroMagic automatically manages layer visibility based on the selected palette:</p>
+   <ul>
+      <li><strong>SHO (Hubble)</strong>: SHO groups visible, plain RGB groups hidden. This prevents the broadband image from washing out the false-color narrowband palette.</li>
+      <li><strong>HOO</strong>: Both HOO and RGB groups remain visible.</li>
+      <li><strong>DNBHO + RGB</strong>: Both dualband narrowband and RGB groups remain visible.</li>
+   </ul>
+   <p>You can always toggle layer visibility manually in the Layers panel after import.</p>
+</div>
+
+<!-- ========== MOSAIC WORKFLOW ========== -->
+
+<h2>Mosaic Workflow</h2>
+<div class="section">
+   <p>PiMagic and AstroMagic work together in a single-run mosaic workflow. PiMagic performs the coordinate alignment; AstroMagic performs blending and layer organization.</p>
+   <div class="highlight">
+      <strong>One run, not two.</strong> You no longer run PiMagic a second time to build a mosaic. There is no &#8220;two-cycle&#8221;, no &#8220;two-pass&#8221;, and no user-started second PiMagic pass. In a single run PiMagic stacks and processes the panes, plate-solves each pane and caches its WCS, then reprojects every pane onto one common full canvas with PixInsight&#8217;s <code>MosaicByCoordinates</code> engine (origin 0,0, no per-pane crop &#8212; each reprojected pane is the full canvas size and is zero outside that pane&#8217;s sky footprint). It writes those already-aligned per-pane TIFFs into <code>Images/By_Pane/Align_by_Coordinates/</code> plus a <code>mosaic_magic.json</code> sidecar that describes the canvas WCS and the aligned-pane paths. AstroMagic then imports those aligned panes and only <em>blends</em> them in Photoshop &#8212; it does not align them.
+   </div>
+
+   <h3>Stage 1: Process and Align in PiMagic</h3>
+   <ol>
+      <li>Load your multi-panel data into PiMagic. Pane naming, folder structure, FITS <code>OBJECT</code> values, pointing clusters, and trailing numeric patterns can all trigger mosaic detection.</li>
+      <li>Click <strong>Start</strong> once. PiMagic processes each pane, solves the geometry, runs MosaicByCoordinates / PerPaneMBC alignment, and writes aligned pane TIFFs under <code>Images/By_Pane/Align_by_Coordinates/</code>.</li>
+      <li>PiMagic writes <code>mosaic_magic.json</code> and <code>_pimagic.json</code> in the parent PiMagic output folder. These sidecars carry the canvas, pane offsets, rotation/orientation contract, equipment metadata, target name, acquisition details, and output roles.</li>
+   </ol>
+
+   <h3>Stage 2: Blend in AstroMagic</h3>
+   <ol>
+      <li>In AstroMagic, click <strong>Import Folder</strong> and select the parent <code>PiMagic</code> output folder, not only the aligned-pane subfolder.</li>
+      <li>AstroMagic reads <code>mosaic_magic.json</code>, loads the PiMagic-aligned pane TIFFs, places them according to PiMagic geometry, and skips Photoshop Auto-Align when <code>geometry_complete</code> is true.</li>
+      <li>AstroMagic runs Auto-Blend / layer organization, imports complete-mosaic overlays from <code>Images/Complete_Mosaic/</code> when present, and saves the PSB beside the PiMagic outputs.</li>
+      <li>Because the panes arrive pre-aligned, AstroMagic logs <em>&#8220;Step 2: Auto-Align SKIPPED &#8212; panes pre-aligned by PI&#8221;</em> and goes straight to the blend. It imports the aligned full-canvas TIFFs as layers and runs Photoshop&#8217;s Auto-Blend (the proven panorama / <code>mergeAlignedLayers</code> path) to feather the seams, then applies auto-endpoints to set levels. <strong>Stars</strong> roles are composited with a black-safe Lighten / max blend so that no pane&#8217;s stars are dropped, while <strong>Starless</strong> and <strong>Final</strong> roles are feathered through Auto-Blend. None of this is a second PiMagic run &#8212; it is the blend half of the same single-run handoff.</li>
+   </ol>
+
+   <div class="highlight">
+      <strong>Mosaic alignment ownership:</strong> PiMagic owns plate solving, MosaicByCoordinates / PerPaneMBC alignment, rotation, pane placement, and the <code>mosaic_magic.json</code> handoff. AstroMagic owns Photoshop blending and layer preparation. Photoshop Auto-Align is only a fallback when PiMagic marks the handoff geometry incomplete because a pane could not be solved.
+   </div>
+
+   <h3>Legacy / Manual Fallback Terms</h3>
+   <p>Older logs and older manuals may mention <code>Mosaic_in.json</code>, <code>Mosaic_out.json</code>, <code>_mosaic_pimagic</code>, <em>Save Mosaics</em>, Photomerge, or a PiMagic second pass. These names describe the previous two-pass mosaic round-trip and remain useful only when diagnosing older runs or manually recovering a mosaic that was not completed through the current coordinate handoff.</p>
+   <ul>
+      <li><strong>Save Mosaics</strong> can still export manually assembled mosaic layers into a <code>_mosaic_pimagic</code> folder for legacy recovery.</li>
+      <li><strong>Photomerge / Photoshop Auto-Align</strong> is not the normal PiMagic mosaic path. It is reserved for fallback when PiMagic cannot complete coordinate geometry for one or more panes.</li>
+      <li><strong>Current public procedure:</strong> one PiMagic run, then AstroMagic import/blend from the parent PiMagic output folder.</li>
+   </ul>
+
+   <h3>Supported Mosaic Configurations</h3>   <h3>Nightscape / Landscape Mosaics &#8212; Two Alignment Methods</h3>
+   <p>For multi-pane nightscape and landscape mosaics, PiMagic offers two ways to align the panes, selected in PiMagic with the <strong>Mosaic:</strong> dropdown next to the Nightscape checkbox. Both are still a <strong>single PiMagic run</strong> &#8212; the choice only changes <em>who</em> aligns the panes, not the number of passes. AstroMagic follows whichever method PiMagic recorded in <code>mosaic_magic.json</code>.</p>
+   <ul>
+      <li><strong>Coordinates (default, recommended)</strong> &#8212; PiMagic plate-solves each nightscape pane, caches its WCS, and reprojects the panes onto a common full canvas with <code>MosaicByCoordinates</code> (forced to a Stereographic projection to preserve the wide panorama geometry). The handoff is written with <code>geometry_complete = true</code>, so AstroMagic <strong>skips Photoshop Auto-Align</strong> and only blends the pre-aligned panes &#8212; the same idea as a deep-sky mosaic, giving sub-pixel registration and PiMagic-owned whole-mosaic annotation. Use this whenever the panes plate-solve reliably (there is real sky / stars to solve).</li>
+      <li><strong>Photoshop Align+Blend (legacy v2.0 behaviour)</strong> &#8212; PiMagic deliberately skips <code>MosaicByCoordinates</code> and the coordinate handoff, saves the pane outputs, and marks the handoff <code>requires_auto_align = true</code> with <code>alignment_owner = &#8220;AstroMagic_Photoshop_AutoAlign&#8221;</code>. AstroMagic then runs Photoshop&#8217;s feature-based <strong>Auto-Align</strong> on all panes and <strong>Auto-Blends</strong> them, rebuilding the synthetic Stars layer with a black-safe Lighten blend. Use this for very wide / ultra-wide landscape panoramas, large foregrounds, or sparse / unsolvable star fields where plate-solving the individual panes is unreliable, so you let Photoshop stitch them.</li>
+   </ul>
+   <div class="tip">
+      <strong>Tip:</strong> Leave the method on <strong>Coordinates</strong> unless plate-solving the individual nightscape panes fails &#8212; only then switch to <strong>Photoshop Align+Blend</strong>. Either way it is one PiMagic run followed by one AstroMagic import / blend.
+   </div>
+
+   <table>
+      <tr><th>Configuration</th><th>Output Layers</th></tr>
+      <tr><td>RGB broadband (e.g., 2-panel DSLR)</td><td>1 assembled RGB layer</td></tr>
+      <tr><td>Mono narrowband SHO (e.g., 2-panel Ha+OIII+SII)</td><td>Ha, OIII, SII, SHO (combined), HOO (combined) layers</td></tr>
+      <tr><td>OSC + dualband (e.g., 4-panel L-Enhance)</td><td>DNBHO, RGB layers</td></tr>
+   </table>
+
+   <div class="tip">
+      <strong>Tip:</strong> For narrowband mosaics, PiMagic can provide individual filter layers (Ha, OIII, SII) and pre-combined palette images (HOO, SHO). AstroMagic keeps those roles separate so Stars, Starless, Final, and palette layers do not overwrite each other.
+   </div>
+</div>
+
+<!-- ========== INSTALLATION ========== -->
+
+<h2>Installation</h2>
+<div class="section">
+   <p>AstroMagic is installed exclusively from PiMagic&#8217;s <strong>Tools</strong> tab in PixInsight. Both the plugin and actions are bundled with PiMagic &#8212; no separate download required.</p>
+
+   <h3>Prerequisites</h3>
+   <ul>
+      <li>Adobe Photoshop 2023 (v24.0) or later</li>
+      <li>Adobe Creative Cloud Desktop app installed and running</li>
+      <li>PiMagic v2.4 installed in PixInsight</li>
+      <li>For PiMagic processing before AstroMagic import: stand-alone RC-Astro CLI installed and checked in PiMagic. PiMagic v2.4 uses <code>rc-astro</code> for BlurXTerminator, NoiseXTerminator, and StarXTerminator instead of the PixInsight RC-Astro process modules.</li>
+   </ul>
+
+   <h3>Step 1: Install the AstroMagic Plugin</h3>
+   <ol>
+      <li>Launch PiMagic in PixInsight (Script &#8594; PiMagic Studio &#8594; PiMagic)</li>
+      <li>Use the first-run Welcome Wizard, <em>Tools &rarr; Check Plugins</em>, or the <strong>Tools</strong> tab</li>
+      <li>In the AstroMagic section, click <strong>Install Plugin</strong></li>
+      <li>The Adobe Creative Cloud installer will launch automatically</li>
+      <li>Accept the security warnings (&#8220;Install locally&#8221; &#8594; &#8220;OK&#8221;)</li>
+      <li>Wait for the installation to complete</li>
+      <li>Restart Photoshop</li>
+   </ol>
+
+   <h3>Step 2: Install PsMagic Actions</h3>
+   <div class="warning">
+      <strong>Important:</strong> Photoshop must be open before clicking Install Actions.
+   </div>
+   <ol>
+      <li>Open <strong>Photoshop</strong> (it must be running)</li>
+      <li>In PiMagic, click <strong>Install Actions</strong> from the Welcome Wizard, <em>Tools &rarr; Check Plugins</em>, or the <strong>Tools</strong> tab</li>
+      <li>PiMagic connects directly to Photoshop and runs the installer automatically &#8212; no file browsing needed</li>
+      <li>The installer removes any existing PsMagic Actions set and loads the current version</li>
+      <li>A success confirmation will appear when installation is complete</li>
+   </ol>
+
+   <h3>Accessing AstroMagic</h3>
+   <p>After installation, access AstroMagic in Photoshop:</p>
+   <p><strong>Plugins &#8594; AstroMagic</strong></p>
+   <p>The AstroMagic panel will open and can be docked anywhere in your workspace.</p>
+
+   <h3>Verify PsMagic Actions</h3>
+   <p>Check that <strong>PsMagic Actions</strong> appears in your Actions panel (Window &#8594; Actions). There should be exactly one PsMagic Actions set &#8212; the installer handles cleanup automatically.</p>
+</div>
+
+<!-- ========== PSMAGIC ACTIONS ========== -->
+
+<h2>PsMagic Actions Reference</h2>
+<div class="section">
+   <p>The PsMagic Actions panel provides one-click Photoshop Actions for common astrophotography tasks. These actions are installed through PiMagic&#8217;s Welcome Wizard, plugin checker, or Tools tab and complement AstroMagic&#8217;s layer organization workflow.</p>
+
+   <h3>Available Actions</h3>
+   <table>
+      <tr>
+         <th>Category</th>
+         <th>Actions</th>
+         <th>Description</th>
+      </tr>
+      <tr>
+         <td><strong>Layer Blending</strong></td>
+         <td>Blend modes, opacity presets</td>
+         <td>Quick layer blend operations for combining channel data</td>
+      </tr>
+      <tr>
+         <td><strong>Star Manipulation</strong></td>
+         <td>Star reduction, star enhancement</td>
+         <td>Control star size and appearance in your images</td>
+      </tr>
+      <tr>
+         <td><strong>Narrowband Palettes</strong></td>
+         <td>SHO, HOO, palette switching</td>
+         <td>Switch between narrowband color palettes</td>
+      </tr>
+      <tr>
+         <td><strong>Continuum Subtraction</strong></td>
+         <td>Continuum subtract</td>
+         <td>Remove continuum from narrowband channels for cleaner emission data</td>
+      </tr>
+      <tr>
+         <td><strong>Structure Enhancement</strong></td>
+         <td>Structure layers, Smart Filters</td>
+         <td>Enhance fine detail and structure in nebulae and galaxies</td>
+      </tr>
+   </table>
+
+   <h3>Using Actions</h3>
+   <ol>
+      <li>Open the Actions panel: <strong>Window</strong> &#8594; <strong>Actions</strong></li>
+      <li>Expand the <strong>PsMagic Actions</strong> folder</li>
+      <li>Select the desired action</li>
+      <li>Click the Play button (&#9654;) to run the action</li>
+   </ol>
+</div>
+
+<!-- ========== LICENSE ========== -->
+
+<h2>License Status</h2>
+<div class="section">
+   <p>AstroMagic is now free and independent of PiMagic license activation. There is no AstroMagic license key, activation button, refresh step, or transfer workflow.</p>
+   <ol>
+      <li>Install AstroMagic.</li>
+      <li>Open it in Photoshop.</li>
+      <li>Use the Tools tab to confirm the panel shows <strong>Free and ready</strong>.</li>
+   </ol>
+   <p><strong>Availability:</strong> AstroMagic can now be installed on its own and used without a PiMagic entitlement on the same machine.</p>
+</div>
+
+<!-- ========== UPDATING ========== -->
+
+<h2>Updating AstroMagic</h2>
+<div class="section">
+   <p>AstroMagic updates are delivered through PiMagic&#8217;s repository and installed from the current bundled files. To update:</p>
+   <ol>
+      <li>In PixInsight, go to <strong>Resources</strong> &#8594; <strong>Updates</strong> &#8594; <strong>Check for Updates</strong></li>
+      <li>Install the PiMagic update (AstroMagic files are included)</li>
+      <li>In PiMagic&#8217;s Welcome Wizard, plugin checker, or Tools tab, click <strong>Install Plugin</strong> to install the current bundled plugin</li>
+      <li>If the bundled PsMagic Action set changed, click <strong>Install Actions</strong> (this automatically removes old versions)</li>
+      <li>Restart Photoshop</li>
+   </ol>
+   <div class="warning">
+      <strong>Note:</strong> Do not uninstall the old version first &#8211; this may delete your preferences and settings.
+   </div>
+</div>
+
+<!-- ========== TROUBLESHOOTING ========== -->
+
+<h2>Troubleshooting</h2>
+<div class="section">
+   <h3>Plugin Not Appearing in Plugins Menu</h3>
+   <ol>
+      <li><strong>Restart Photoshop</strong> completely (close and reopen)</li>
+      <li>Verify the plugin is installed: Go to <strong>Plugins</strong> &#8594; <strong>Manage Plugins</strong></li>
+      <li>Look for AstroMagic in the list and make sure it is <strong>enabled</strong></li>
+      <li>Check that your Photoshop version is 2023 (v24.0) or later</li>
+   </ol>
+
+   <h3>Plugin Installation Fails</h3>
+   <ol>
+      <li>Make sure the .ccx file is on the same drive as Photoshop</li>
+      <li>Use the <strong>Open Folder</strong> button in PiMagic&#8217;s Tools tab to verify the .ccx file exists</li>
+      <li>Quit Creative Cloud Desktop completely, restart it, then try again</li>
+   </ol>
+
+   <h3>Actions Not Installing</h3>
+   <ol>
+      <li>Ensure <strong>Photoshop is open</strong> before clicking Install Actions in PiMagic</li>
+      <li>If the automatic installer fails, PiMagic will show a fallback dialog with manual instructions</li>
+      <li>Manual fallback: In Photoshop, go to File &#8594; Scripts &#8594; Browse... and select <code>Install_PsMagic_Actions.jsx</code> from the AstroMagic folder</li>
+   </ol>
+
+   <h3>macOS Security Warning</h3>
+   <p>If you see &#8220;can&#8217;t be opened because it is from an unidentified developer&#8221;:</p>
+   <ol>
+      <li>Go to <strong>System Preferences</strong> &#8594; <strong>Security &amp; Privacy</strong> &#8594; <strong>General</strong></li>
+      <li>Click <strong>Open Anyway</strong> next to the blocked plugin message</li>
+   </ol>
+</div>
+
+<!-- ========== VIDEO TUTORIALS ========== -->
+
+<h2>Video Tutorials</h2>
+<div class="section">
+   <p>Comprehensive video tutorials are available at <a href="https://pimagicstudio.com/about/">pimagicstudio.com/about/</a></p>
+   <p>YouTube: <a href="https://youtube.com/@utahdesertremoteobservator8328">Utah Desert Remote Observatories</a></p>
+</div>
+
+<!-- ========== FOOTER ========== -->
+
+<p class="version">&#169; 2025&#8211;2026 Christian Sasse &amp; Craig Stocks. All rights reserved.<br/>
+PiMagic, AstroMagic, and pimagicstudio.com are trademarks of Sasse Consulting.</p>
+
+</body>
+</html>
